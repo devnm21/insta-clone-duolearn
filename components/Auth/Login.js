@@ -17,8 +17,7 @@ const Login = () => {
   const handleSubmit = async () => {
         setIsLoading(true)
       try {
-          const user = await signInUser(email, password)
-          updateProfile(user.user)
+          await signInUser(email, password)
           router.push('/home')
       } catch (e) {
           setError(e.message)

@@ -1,4 +1,7 @@
-import React, { ReactChild, useState } from "react";
+import React, {ReactChild, useEffect, useState} from "react";
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from "../lib/firebase";
+import {getUserByUid} from "../utils/firebase-utils";
 
 export const UserContext = React.createContext({
     profile: {
@@ -23,6 +26,13 @@ export const UserProvider = ({ children }) => {
     const updateProfile = (newProfile) => {
         setProfile(newProfile);
     }
+
+    useEffect(() => {
+        onAuthStateChanged(auth, async (user) => {
+            const firestoreUser = await getUserByUid(user.uid)
+            updateProfile(firestoreUser)
+        })
+    }, [])
 
     return (
         <UserContext.Provider value={{ profile, updateProfile }}>

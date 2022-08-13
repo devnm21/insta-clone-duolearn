@@ -6,18 +6,25 @@ import {
     ModalFooter,
     ModalBody,
     ModalCloseButton, Button, Box,
-    Flex, Text, FormControl, Image, Input, Textarea
+    Flex, Text, FormControl, Image, Input, Textarea,
+    useToast,
 } from '@chakra-ui/react'
 import {AiOutlinePlusSquare} from 'react-icons/ai'
-import {useState, useRef} from "react";
+import {useState, useRef, useContext} from "react";
+import {addPostToUser, createPostInFirestore, createStorageRef} from "../utils/firebase-utils";
+import { uploadBytes, getDownloadURL } from 'firebase/storage'
+import {UserContext} from "../context/user";
 
 const ImageUpload = (props) => {
-
+    const { profile } = useContext(UserContext)
+    const toast = useToast()
     const [file, setFile] = useState({
         raw: null,
         preview: ""
     })
     const [caption, setCaption] = useState('')
+    const [isLoading, setLoading] = useState(false)
+
 
     const UploadBtnRef = useRef();
 
@@ -25,7 +32,6 @@ const ImageUpload = (props) => {
         event.preventDefault();
         const inputfiles = event?.target?.files;
         const objectUrl = URL.createObjectURL(inputfiles[0])
-
         setFile({raw: inputfiles[0], preview: objectUrl });
         event.target.value = "";
     };
@@ -40,11 +46,24 @@ const ImageUpload = (props) => {
         setCaption(e.target.value);
     }
 
-    const handleUpload = () => {
-        console.log({
-            file: file.raw,
-            caption: caption
+    const handleUpload = async () => {
+        setLoading(true)
+        const ref = await createStorageRef(profile.uid + '/uploads/' +file.raw.name)
+        await uploadBytes(ref, file.raw)
+        const url = await getDownloadURL(ref)
+        const postRef = await createPostInFirestore(url, caption, profile.username, profile.uid)
+        await addPostToUser(postRef.id, profile.uid)
+        toast({
+            status: 'success',
+            title: 'Post uploaded! Go back to scrolling'
         })
+        setCaption('')
+        setFile({
+            raw: null,
+            preview: ""
+        })
+        props.onClose()
+        setLoading(false)
     }
 
     return <>
@@ -104,7 +123,13 @@ const ImageUpload = (props) => {
                     <Button mr={3} onClick={props.onClose}>
                         Close
                     </Button>
-                    <Button colorScheme={'primary'} onClick={handleUpload}>Upload</Button>
+                    <Button
+                        isLoading={isLoading}
+                        disabled={isLoading}
+                        colorScheme={'primary'}
+                        onClick={handleUpload}>
+                        Upload
+                    </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>

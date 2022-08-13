@@ -4,21 +4,25 @@ import Image from 'next/image'
 import {BsHeart, BsBookmark, BsChat} from 'react-icons/bs'
 import {FiSend} from 'react-icons/fi'
 
-const FeedItem = () => {
+const FeedItem = ({
+    userName,
+    photoUrl,
+    caption,
+                  }) => {
     return <>
         <Flex flexDir={'column'} bg={'white'} boxShadow={'sm'}>
 
             <Flex alignItems={'center'} justifyContent={'space-between'} px={'10px'} py={'1rem'}>
                 <Flex alignItems={'center'} gap={'10px'}>
                     <Avatar name={'Pavan'} size={'sm'} />
-                    <Text>Pavan</Text>
+                    <Text>{userName}</Text>
                 </Flex>
                 <BsThreeDots size={'1.5rem'} />
             </Flex>
 
             <Box w={'100%'} h={'400px'} pos={'relative'}>
                 <Image
-                    src={'https://instagram.fblr2-1.fna.fbcdn.net/v/t51.2885-15/297516488_632029231409297_2131938439554666751_n.webp?stp=dst-jpg_e35&cb=2d435ae8-d7f9aae8&_nc_ht=instagram.fblr2-1.fna.fbcdn.net&_nc_cat=105&_nc_ohc=2qaFccQti-kAX9ztCL5&edm=AJ9x6zYBAAAA&ccb=7-5&ig_cache_key=Mjg5ODAyODU2NTIzMzYzNzM4MQ%3D%3D.2-ccb7-5&oh=00_AT_N7cV9D3powKDiQpr9-xT_spUd1msgysUW1eenp9O3Ww&oe=62FB3BD8&_nc_sid=cff2a4'}
+                    src={photoUrl}
                     alt={'Demo feed image'}
                     layout={'fill'}
                 />
@@ -42,7 +46,7 @@ const FeedItem = () => {
                     <Text fontSize={'sm'}>and</Text>
                     <Text fontSize={'sm'} fontWeight={'bold'}>100 others</Text>
                 </Flex>
-
+                <Text my={2} fontSize={'sm'}>{caption}</Text>
                 <Text my={'1rem'} textTransform={'uppercase'} fontSize={'xs'} color={'gray.600'}>6 days ago</Text>
             </Container>
 
